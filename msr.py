@@ -42,9 +42,38 @@ class MSR(object):
         return d
 
 
-if __name__ == '__main__':
-    import sys
-    m = MSR(sys.argv[1])
-    print "COMMTEST: ", m.commtest()
+def parse_args():
+    import argparse
 
-    print m.read()
+    parser = argparse.ArgumentParser(description='read/write magnetic stripe cards using'
+                                     ' MSR805 compatible reader/writer')
+    parser.add_argument('tty', metavar='TTY', type=str,
+                        help='the path to the tty of the reader/writer')
+    parser.add_argument('--pretend', '-p', dest='pretend', action='store_const',
+                        const=bool, default=False,
+                        help=('don\'t actually perform any writes, just show what would'
+                              ' be done'))
+
+    parser.add_argument('--read', '-r', dest='read_file', default=None,
+                        help='read a card into the specified file')
+    parser.add_argument('--write', '-w', dest='write_file', default=None,
+                        help='write a card from the specified file')
+    parser.add_argument('--copy', '-c', dest='copy', action='store_const',
+                        const=bool, default=False,
+                        help='copy a card')
+
+    args = parser.parse_args()
+    return args
+
+
+if __name__ == '__main__':
+    args = parse_args()
+    m = MSR(args.tty)
+    print "COMMTEST: ", m.commtest()
+    print; print; print
+
+    if args.read:
+        import json
+        print m.read()
+
+    print; print; print
